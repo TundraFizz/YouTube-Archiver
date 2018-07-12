@@ -15,6 +15,14 @@ app.post("/archive", function(req, res){
   var apiKey      = config["apiKey"];
   var metaDataUrl = `https://www.googleapis.com/youtube/v3/videos/?id=${videoId}&part=${part}&key=${apiKey}`;
 
+  if(!fs.existsSync("./src/videos")) fs.mkdirSync("./src/videos");
+
+  var dir = `./src/videos/${videoId}`;
+
+  if(!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+  }
+
   request(metaDataUrl, {json:true}, function(error, response, obj){
     // Info wanted:
     // * ID        [from user]
@@ -38,7 +46,7 @@ app.post("/archive", function(req, res){
     }
 
     process.stdout.write("Downloading image... ");
-    var image = request(urlOfLargestThumbnail).pipe(fs.createWriteStream(`./src/static/videos/${videoId}.jpg`));
+    var image = request(urlOfLargestThumbnail).pipe(fs.createWriteStream(`${dir}/${videoId}.jpg`));
 
     image.on("finish", function(){
       console.log("completed!");
@@ -48,7 +56,7 @@ app.post("/archive", function(req, res){
       var link = `https://www.youtube.com/watch?v=${videoId}`;
       var video = ytdl(link);
 
-      video.pipe(fs.createWriteStream(`./src/static/videos/${videoId}.mp4`));
+      video.pipe(fs.createWriteStream(`${dir}/${videoId}.mp4`));
 
       process.stdout.write("Downloading video... ");
 
