@@ -10,18 +10,14 @@ app.get("/", function(req, res){
 
 app.post("/archive", function(req, res){
   var link        = req["body"]["link"];
-  var videoId     = link.split("watch?v=")[1];
+  var videoId     = link.split("watch?v=")[1].split("&")[0];
   var part        = "snippet%2CcontentDetails";
   var apiKey      = config["apiKey"];
   var metaDataUrl = `https://www.googleapis.com/youtube/v3/videos/?id=${videoId}&part=${part}&key=${apiKey}`;
+  var dir         = `./src/videos/${videoId}`;
 
   if(!fs.existsSync("./src/videos")) fs.mkdirSync("./src/videos");
-
-  var dir = `./src/videos/${videoId}`;
-
-  if(!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
-  }
+  if(!fs.existsSync(dir))            fs.mkdirSync(dir);
 
   request(metaDataUrl, {json:true}, function(error, response, obj){
     // Info wanted:
