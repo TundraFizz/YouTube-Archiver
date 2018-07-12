@@ -27,8 +27,6 @@ app.post("/archive", function(req, res){
     var thumbnails = obj["items"][0]["snippet"]["thumbnails"];
     var duration   = obj["items"][0]["contentDetails"]["duration"];
 
-    // Duration Format: PT4M35S = 4 minutes, 35 seconds => 275 seconds
-
     var urlOfLargestThumbnail  = "";
     var areaOfLargestThumbnail = 0;
 
@@ -67,6 +65,7 @@ app.post("/archive", function(req, res){
         var minutes = 0;
         var seconds = 0;
 
+        // Duration Format: PT2H4M35S
         if(/([0-9])H/g.exec(duration)) hours   = parseInt(/([0-9])H/g.exec(duration)[1]);
         if(/([0-9])M/g.exec(duration)) minutes = parseInt(/([0-9])M/g.exec(duration)[1]);
         if(/([0-9])S/g.exec(duration)) seconds = parseInt(/([0-9])S/g.exec(duration)[1]);
@@ -75,12 +74,9 @@ app.post("/archive", function(req, res){
 
         console.log("completed!");
         console.log(title);
-        console.log(urlOfLargestThumbnail);
-        console.log(duration);
-        console.log(hours);
-        console.log(minutes);
-        console.log(seconds);
         console.log(totalSeconds);
+
+        // Update database
       });
 
       video.on("error", function(err){
