@@ -1,0 +1,27 @@
+{
+  "name": "youtube-archiver",
+  "version": "1.0.0",
+  "description": "A web application where I can give it a YouTube URL and it'll archive it for me",
+  "main": "server.js",
+  "author": "Tundra Fizz",
+  "license": "ISC",
+  "dependencies": {
+    "express": "latest",
+    "ejs": "latest",
+    "ytdl-core": "latest"
+  },
+  "dependencies-comments": {
+    "express": "Web framework",
+    "ejs": "Templating engine",
+    "ytdl-core": "Downloads YouTube videos"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "nodemon": "nodemon src/server.js"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TundraFizz/YouTube-Archiver"
+  }
+}
