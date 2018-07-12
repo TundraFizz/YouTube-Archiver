@@ -2,17 +2,17 @@ var app     = require("../server.js");
 var fs      = require("fs");
 var request = require("request");
 var ytdl    = require("ytdl-core");
+var config  = require("../../config.json");
 
 app.get("/", function(req, res){
   res.render("index.ejs");
 });
 
 app.post("/archive", function(req, res){
-
-  // var videoId  = req["body"]["videoId"];
-  var videoId     = "-PKNuZovuSw";
+  var link        = req["body"]["link"];
+  var videoId     = link.split("watch?v=")[1];
   var part        = "snippet%2CcontentDetails";
-  var apiKey      = "000000000000000000000000000000000000000";
+  var apiKey      = config["apiKey"];
   var metaDataUrl = `https://www.googleapis.com/youtube/v3/videos/?id=${videoId}&part=${part}&key=${apiKey}`;
 
   request(metaDataUrl, {json:true}, function(error, response, obj){
@@ -39,36 +39,56 @@ app.post("/archive", function(req, res){
       }
     }
 
-    console.log(title);
-    console.log(urlOfLargestThumbnail);
-    console.log(duration);
+    process.stdout.write("Downloading image... ");
+    var image = request(urlOfLargestThumbnail).pipe(fs.createWriteStream(`./src/static/videos/${videoId}.jpg`));
 
-    var percentNow = 0;
+    image.on("finish", function(){
+      console.log("completed!");
 
-    var link = `https://www.youtube.com/watch?v=${videoId}`;
-    var stream = ytdl(link);
+      var percentNow = 0;
 
-    stream.pipe(fs.createWriteStream(`./src/static/videos/${videoId}.mp4`));
+      var link = `https://www.youtube.com/watch?v=${videoId}`;
+      var video = ytdl(link);
 
-    console.log("Downloading...");
+      video.pipe(fs.createWriteStream(`./src/static/videos/${videoId}.mp4`));
 
-    stream.on("progress", function(a,b,c){
-      var qwe = Math.ceil((b/c) * 100);
-      if(qwe > percentNow){
-        percentNow = qwe;
-        console.log(`${percentNow}%`);
-      }
+      process.stdout.write("Downloading video... ");
+
+      video.on("progress", function(a,b,c){
+        // var qwe = Math.ceil((b/c) * 100);
+        // if(qwe > percentNow){
+        //   percentNow = qwe;
+        //   console.log(`${percentNow}%`);
+        // }
+      });
+
+      video.on("finish", function(){
+        var hours   = 0;
+        var minutes = 0;
+        var seconds = 0;
+
+        if(/([0-9])H/g.exec(duration)) hours   = parseInt(/([0-9])H/g.exec(duration)[1]);
+        if(/([0-9])M/g.exec(duration)) minutes = parseInt(/([0-9])M/g.exec(duration)[1]);
+        if(/([0-9])S/g.exec(duration)) seconds = parseInt(/([0-9])S/g.exec(duration)[1]);
+
+        var totalSeconds = (hours * 60 * 60) + (minutes * 60) + seconds;
+
+        console.log("completed!");
+        console.log(title);
+        console.log(urlOfLargestThumbnail);
+        console.log(duration);
+        console.log(hours);
+        console.log(minutes);
+        console.log(seconds);
+        console.log(totalSeconds);
+      });
+
+      video.on("error", function(err){
+        console.log(">>>>>>>> ERROR!");
+        console.log(err);
+      });
+
+      res.json({});
     });
-
-    stream.on("finish", function(){
-      console.log(">>>>>>>> FINISH!");
-    });
-
-    stream.on("error", function(err){
-      console.log(">>>>>>>> ERROR!");
-      console.log(err);
-    });
-
-    res.json({});
   });
 });
