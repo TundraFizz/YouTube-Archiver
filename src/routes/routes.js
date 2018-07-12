@@ -12,7 +12,7 @@ app.post("/archive", function(req, res){
   // var videoId  = req["body"]["videoId"];
   var videoId     = "-PKNuZovuSw";
   var part        = "snippet%2CcontentDetails";
-  var apiKey      = "AIzaSyDrUpWR74T1E5rrNcmHcm6Gjifgdn0HCZ0";
+  var apiKey      = "000000000000000000000000000000000000000";
   var metaDataUrl = `https://www.googleapis.com/youtube/v3/videos/?id=${videoId}&part=${part}&key=${apiKey}`;
 
   request(metaDataUrl, {json:true}, function(error, response, obj){
