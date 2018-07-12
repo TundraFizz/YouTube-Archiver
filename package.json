@@ -8,11 +8,13 @@
   "dependencies": {
     "express": "latest",
     "ejs": "latest",
+    "request": "latest",
     "ytdl-core": "latest"
   },
   "dependencies-comments": {
     "express": "Web framework",
     "ejs": "Templating engine",
+    "request": "HTTP/S requests",
     "ytdl-core": "Downloads YouTube videos"
   },
   "scripts": {
