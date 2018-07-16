@@ -16,16 +16,15 @@ var db = mysql.createPool({
 });
 
 GetVideos = function(){return new Promise((resolve) => {
-  var data = {};
-
-  // Get data from the DB
-  resolve("testing");
+  var sql = "SELECT * FROM library";
+  db.query(sql, function(err, rows){
+    resolve(rows);
+  });
 })}
 
 app.get("/", function(req, res){
   GetVideos().then((data) => {
-    console.log(data);
-    res.render("index.ejs");
+    res.render("index.ejs", {"data":data});
   });
 });
 
@@ -34,7 +33,6 @@ app.post("/archive", function(req, res){
   var videoId      = link.split("watch?v=")[1].split("&")[0];
   var part         = "snippet%2CcontentDetails";
   var apiKey       = app["data"]["apiKey"];
-  console.log(apiKey);
   var metaDataUrl  = `https://www.googleapis.com/youtube/v3/videos/?id=${videoId}&part=${part}&key=${apiKey}`;
   var videosFolder = "videos";
   var dir          = path(`${videosFolder}/${videoId}`);
@@ -106,8 +104,8 @@ app.post("/archive", function(req, res){
         var pathImage = `*/*.jpg`; // ??????????
         var pathVideo = `*/*.mp4`; // ??????????
 
-        var sql  = "INSERT INTO library (youtube_id, title, duration, path_video, path_image) VALUES (?,?,?,?,?)";
-        var args = [videoId, title, totalSeconds, pathVideo, pathImage];
+        var sql  = "INSERT INTO library (youtube_id, title, duration, path_image, path_video) VALUES (?,?,?,?,?)";
+        var args = [videoId, title, totalSeconds, pathImage, pathVideo];
 
         db.query(sql, args, function(err, rows){
           // Done
