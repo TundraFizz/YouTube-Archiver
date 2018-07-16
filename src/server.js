@@ -12,6 +12,7 @@ fs.readFile("config.json", "utf-8", function(err, data){
 
   app.set("views", __dirname + "/views");           // Define the views directory
   app.use(express.static(__dirname + "/static"));   // Define the static directory
+  app.use(express.static(__dirname + "/videos"));   // Define the static directory
   app.use(bodyParser.urlencoded({extended: true})); // Setting for bodyParser
   require(__dirname + "/routes/routes.js");         // Include web routes third
   app.listen(80);                                   // Start the server
