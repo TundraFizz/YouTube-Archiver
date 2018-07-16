@@ -1,11 +1,52 @@
 var app     = require("../server.js");
 var fs      = require("fs");
+var mysql   = require("mysql");
 var request = require("request");
 var ytdl    = require("ytdl-core");
 var config  = require("../../config.json");
 
+function path(path){return `${__dirname}/../${path}`;}
+
+var db = mysql.createPool({
+  "host"    : app["data"]["mysql"]["host"],
+  "user"    : app["data"]["mysql"]["user"],
+  "password": app["data"]["mysql"]["password"],
+  "database": app["data"]["mysql"]["database"]
+});
+
+GetVideos = function(){return new Promise((resolve) => {
+  var data = {};
+
+  fs.readdir(path("videos"), (err, files) => {
+    console.log(files);
+
+    for(var i = 0; i < files.length; i++){
+      var key = files[i];
+      data[key] = {};
+
+      var jobs = files.length;
+
+      // Read the files in the folder
+      // 1. Image file
+      // 2. Video file
+      // ?. Metadata (ToDo)
+
+      fs.readdir(path(`videos/${key}`), (err, files) => {
+        console.log(files);
+        if(--jobs == 0){
+          resolve(data);
+          return;
+        }
+      });
+    }
+  });
+})}
+
 app.get("/", function(req, res){
-  res.render("index.ejs");
+  GetVideos().then((data) => {
+    console.log(data);
+    res.render("index.ejs");
+  });
 });
 
 app.post("/archive", function(req, res){
@@ -14,10 +55,9 @@ app.post("/archive", function(req, res){
   var part        = "snippet%2CcontentDetails";
   var apiKey      = config["apiKey"];
   var metaDataUrl = `https://www.googleapis.com/youtube/v3/videos/?id=${videoId}&part=${part}&key=${apiKey}`;
-  var dir         = `./src/videos/${videoId}`;
+  var dir         = path(`videos/${videoId}`);
 
-  if(!fs.existsSync("./src/videos")) fs.mkdirSync("./src/videos");
-  if(!fs.existsSync(dir))            fs.mkdirSync(dir);
+  if(!fs.existsSync(dir)) fs.mkdirSync(dir);
 
   request(metaDataUrl, {json:true}, function(error, response, obj){
     // Info wanted:
@@ -81,6 +121,12 @@ app.post("/archive", function(req, res){
         console.log(totalSeconds);
 
         // Update database
+        var sql  = "INSERT INTO library (title, duration, path_video, path_image) VALUES (?,?,?,?)";
+        var args = [title, totalSeconds, `${dir}/${videoId}.mp4`, `${dir}/${videoId}.jpg`];
+
+        db.query(sql, args, function(err, rows){
+          // Done
+        });
       });
 
       video.on("error", function(err){
