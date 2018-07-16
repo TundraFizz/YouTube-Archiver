@@ -9,6 +9,7 @@
     "express": "latest",
     "ejs": "latest",
     "request": "latest",
+    "mysql": "latest",
     "ytdl-core": "latest"
   },
   "dependencies-comments": {
