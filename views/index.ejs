@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>YouTube Archiver</title>
+  <meta charset="utf-8">
+  <meta name="description"  content="This is the index">
+  <meta name="author"       content="Tundra Fizz">
+  <link rel="shortcut icon" href="/img/icon.jpg">
+  <link rel="stylesheet"    href="/css/theme.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/index.js"></script>
+</head>
+
+<body>
+  <div class="content">
+    <input id="url"    type="text" style="width: 400px;">
+    <input id="submit" type="button" value="Submit">
+  </div>
+
+  <div class="content">
+    <div>Progress: <span id="progress">0</span>%</div>
+  </div>
+
+  <div class="content">
+    <table>
+      <tr>
+        <th>id</th>
+        <th>youtubeId</th>
+        <th>title</th>
+        <th>duration</th>
+        <th>pathImage</th>
+        <th>pathVideo</th>
+      </tr>
+      <% for(var i of library){ %>
+        <tr>
+          <td><%= i.id        %></td>
+          <td><%= i.youtubeId %></td>
+          <td><%= i.title     %></td>
+          <td><%= i.duration  %></td>
+          <td><%= i.pathImage %></td>
+          <td><%= i.pathVideo %></td>
+        </tr>
+      <% } %>
+    </table>
+  </div>
+</body>
+</html>

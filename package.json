@@ -6,21 +6,23 @@
   "author": "Tundra Fizz",
   "license": "ISC",
   "dependencies": {
-    "express": "latest",
+    "axios": "latest",
+    "body-parser": "latest",
+    "cookie-parser": "latest",
     "ejs": "latest",
-    "request": "latest",
-    "mysql": "latest",
+    "express": "latest",
+    "formidable": "latest",
+    "js-yaml": "latest",
+    "moment": "latest",
+    "mysql2": "latest",
+    "node-sass-middleware": "latest",
+    "socket.io": "latest",
     "ytdl-core": "latest"
   },
-  "dependencies-comments": {
-    "express": "Web framework",
-    "ejs": "Templating engine",
-    "request": "HTTP/S requests",
-    "ytdl-core": "Downloads YouTube videos"
-  },
   "scripts": {
-    "start": "node src/server.js",
-    "nodemon": "nodemon src/server.js"
+    "local": "set mode=local&& nodemon server.js",
+    "dev": "set mode=dev&& nodemon server.js",
+    "prod": "set mode=prod&& node server.js"
   },
   "devDependencies": {},
   "repository": {

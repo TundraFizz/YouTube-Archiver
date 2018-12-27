@@ -1,7 +1,0 @@
-{
-  "host"    : "ENTER_THE_HOST_HERE",
-  "user"    : "ENTER_THE_USER_HERE",
-  "password": "ENTER_THE_PASSWORD_HERE",
-  "database": "ENTER_THE_DATABASE_HERE",
-  "apiKey"  : "ENTER_THE_API_KEY_HERE"
-}
