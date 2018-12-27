@@ -4,6 +4,10 @@ var io   = app.io;
 var fs   = require("fs"); // File system library
 var ytdl = require("ytdl-core");
 
+var connections = {};
+var downloadQueue = [];
+var downloading = false;
+
 app.get("/", async function(req, res){
   var [library] = await db.query("SELECT * FROM library");
 
@@ -12,22 +16,26 @@ app.get("/", async function(req, res){
   });
 });
 
+app.get("/admin", async function(req, res){
+  res.render("admin.ejs");
+});
+
 app.use(function (req, res){
   res.render("404.ejs");
 });
 
-async function Hello(socket, url){await new Promise((done, fail) => {
+async function Hello(url){await new Promise((done, fail) => {
   var prev = -1;
   var current = -1;
-
   var videoObject = ytdl(url);
 
   videoObject.on("progress", (chunkLength, downloaded, total) => {
     current = Math.floor((downloaded / total) * 100);
+
     if(current > prev){
       prev = current;
-      console.log(`Progress: ${current}%`);
-      socket.emit("progress", current);
+      downloadQueue[0]["progress"] = current;
+      io.emit("update", downloadQueue);
     }
   });
 
@@ -45,21 +53,43 @@ async function Hello(socket, url){await new Promise((done, fail) => {
   videoObject.pipe(fs.createWriteStream("video.mp4"));
 })}
 
+async function Trigger(){
+  if(downloading)
+    return;
+  downloading = true;
+
+  while(downloadQueue.length){
+    var url = downloadQueue[0]["url"];
+    await Hello(url);
+    downloadQueue.shift();
+  }
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+  downloading = false;
+}
+
 io.on("connection", function(socket){
   var ip = socket.conn.request.headers["x-real-ip"] || "x-real-ip isn't defined";
   console.log("New connection:", ip);
+  connections[socket.id] = {};
 
   socket.on("archive", async function(msg){
     var url = msg.url;
-    url = "https://www.youtube.com/watch?v=A02s8omM_hI";
     var videoId = url.split("watch?v=")[1].split("&")[0];
 
-    await Hello(socket, url);
-    console.log("========== DONE ==========");
     io.emit("complete");
+    downloadQueue.push({"url": url, "progress": 0});
+    io.emit("update", downloadQueue);
+    Trigger();
+  });
+
+  socket.on("admin", () => {
+    socket.emit("admin", connections);
+    // io.emit               // Sends to everybody
+    // socket.emit           // Only sends to the sender
+    // socket.broadcast.emit // Sends to everybody EXCEPT the sender
   });
 
   socket.on("disconnect", function(){
-    // delete connectionMap[socket.id];
+    delete connections[socket.id];
   });
 });
