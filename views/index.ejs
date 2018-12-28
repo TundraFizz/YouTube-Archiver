@@ -3,12 +3,13 @@
 <head>
   <title>YouTube Archiver</title>
   <meta charset="utf-8">
-  <meta name="description"  content="This is the index">
+  <meta name="description"  content="🐟 🐟 🐟">
   <meta name="author"       content="Tundra Fizz">
   <link rel="shortcut icon" href="/img/icon.jpg">
   <link rel="stylesheet"    href="/css/theme.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/ejs-2-5-8.min.js"></script>
   <script src="/js/index.js"></script>
 </head>
 
@@ -18,40 +19,47 @@
     <input id="submit" type="button" value="Submit">
   </div>
 
-  <div class="content">
-    <div>Progress: <span id="progress">0</span>%</div>
-  </div>
+  <div id="download-queue-base" style="display: none">
+    <hr>
 
-  <div class="content">
-    <table>
-      <tr>
-        <th>Title</th>
-        <th>Progress</th>
-      </tr>
-      <tbody id="download-queue"></tbody>
-    </table>
-  </div>
-
-  <div class="content">
-    <table>
-      <tr>
-        <th>id</th>
-        <th>youtubeId</th>
-        <th>title</th>
-        <th>duration</th>
-        <th>pathImage</th>
-        <th>pathVideo</th>
-      </tr>
-      <% for(var i of library){ %>
+    <div class="content">
+      <table>
         <tr>
-          <td><%= i.id        %></td>
-          <td><%= i.youtubeId %></td>
-          <td><%= i.title     %></td>
-          <td><%= i.duration  %></td>
-          <td><%= i.pathImage %></td>
-          <td><%= i.pathVideo %></td>
+          <th colspan="2">Title</th>
+          <th>Progress</th>
         </tr>
-      <% } %>
+        <tbody id="download-queue">
+          <% for(var i of downloadQueue){ %>
+            <tr>
+              <td><img src="<%= i.thumb %>" style="height: 40px;"></td>
+              <td><%= i.title    %></td>
+              <td><%= i.progress %>%</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="content">
+    <table>
+      <tr>
+        <th colspan="2">Title</th>
+        <th>URL</th>
+        <!-- <th>duration</th> -->
+      </tr>
+      <tbody id="library">
+        <% for(var i of library){ %>
+          <tr>
+            <td><img src="<%= i.pathImage %>" style="height: 40px;"></td>
+            <td><%= i.title %></td>
+            <td><a href="<%= i.pathVideo %>" target="_blank"><%= i.pathVideo %></a></td>
+            <!-- <td><%= i.duration  %></td> -->
+          </tr>
+        <% } %>
+      </tbody>
     </table>
   </div>
 </body>

@@ -21,7 +21,7 @@
   },
   "scripts": {
     "local": "set mode=local&& nodemon server.js",
-    "dev": "set mode=dev&& nodemon server.js",
+    "dev": "set mode=dev&& node server.js",
     "prod": "set mode=prod&& node server.js"
   },
   "devDependencies": {},

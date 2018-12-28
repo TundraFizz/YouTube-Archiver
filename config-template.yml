@@ -18,3 +18,8 @@ mysql:
     user: "ENTER_USERNAME_HERE"
     password: "ENTER_PASSWORD_HERE"
     database: "ENTER_DATABASE_NAME_HERE"
+domain:
+  local: "ENTER_DOMAIN_HERE"
+  dev:   "ENTER_DOMAIN_HERE"
+  prod:  "ENTER_DOMAIN_HERE"
+youtubeApiKey: "ENTER_API_KEY_HERE"
