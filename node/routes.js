@@ -4,6 +4,7 @@ var db    = app.db;
 var io    = app.io;
 var fs    = require("fs"); // File system library
 var axios = require("axios");
+var querystring = require("querystring").stringify;
 var ytdl  = require("ytdl-core");
 
 var connections   = {};
@@ -111,8 +112,14 @@ io.on("connection", function(socket){
       return;
     }
 
-    var qwe = `https://www.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails&id=${videoId}&fields=items(contentDetails%2Fduration%2Csnippet(thumbnails%2Fdefault%2Furl%2Ctitle))&key=${data["youtubeApiKey"]}`;
-    var result = await axios.get(qwe);
+    var qs = querystring({
+      "part"  : "snippet,contentDetails",
+      "id"    : videoId,
+      "fields": "items(contentDetails/duration,snippet(liveBroadcastContent,thumbnails/default/url,title))",
+      "key"   : data["youtubeApiKey"]
+    });
+
+    var result = await axios.get(`https://www.googleapis.com/youtube/v3/videos?${qs}`);
 
     if(result["data"]["items"].length == 0){
       socket.emit("alert", "That video doesn't exist");
@@ -122,17 +129,23 @@ io.on("connection", function(socket){
     var items = result["data"]["items"][0];
     var snippet = items["snippet"]
     var contentDetails = items["contentDetails"];
+    var lbc       = snippet["liveBroadcastContent"];
     var title     = snippet["title"];
     var thumbnail = snippet["thumbnails"]["default"]["url"];
-    var duration  = contentDetails["duration"];
-    console.log("=================================================")
-    console.log(title);
-    console.log("=================================================")
-    console.log(thumbnail);
-    console.log("=================================================")
-    console.log(duration);
+    var duration  = contentDetails["duration"]; // PT#S or PT#M#S or PT#H#M#S
 
-    downloadQueue.push({"url": url, "progress": 0});
+    if(lbc != "none"){
+      socket.emit("alert", `Can't download livestreams. The livestream status is: ${lbc}`);
+      return;
+    }
+
+    downloadQueue.push({
+      "url": url,
+      "thumb": thumbnail,
+      "title": title,
+      "progress": "Initializing..."
+    });
+
     io.emit("update", downloadQueue);
     Trigger();
   });
